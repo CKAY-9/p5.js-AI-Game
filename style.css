@@ -1,8 +1,59 @@
-html, body {
-    margin: 0;
-    padding: 0;
-  }
-  canvas {
-    display: block;
-  }
-  
+@import url('https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Inter:wght@400;700;900&display=swap');
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: rgb(5, 5, 10);
+  font-family: 'Inter', sans-serif;
+}
+
+canvas {
+  display: block;
+}
+
+.time-survived {
+  position: absolute;
+  color: white;
+  right: 5vw;
+  top: 5vh;
+}
+.time-survived-over {
+  color: white;
+  position: absolute;
+  top: 46vh;
+  left: 50vw;
+  right: 0vw;
+  font-size: 1.5vw;
+  width: fit-content;
+  transform: translate(-50%, -50%);
+}
+
+#retry-button {
+  color: white;
+  background-color: rgb(12, 12, 17);
+  border: none;
+  padding: 2vh 2vw;
+
+  position: absolute;
+  top: 50vh;
+  left: 50vw;
+  transform: translate(-50%, -50%);
+
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+}
+#retry-button:hover {
+  cursor: pointer;
+}
+
+#gameover-text {
+  color: white;
+  font-size: 3vw;
+  font-weight: 900;
+
+  position: absolute;
+  top: 40vh;
+  left: 50vw;
+  transform: translate(-50%, -50%);
+}

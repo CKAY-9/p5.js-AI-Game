@@ -1,10 +1,10 @@
-const windowX = 400;
-const windowY = 400;
+const windowX = window.screen.width;
+const windowY = window.screen.height;
 
 // AI
 let classifier;
 // Model URL
-let imageModelURL = "https://teachablemachine.withgoogle.com/models/nNpmX3_UT/";
+let imageModelURL = "https://teachablemachine.withgoogle.com/models/-AfpM-uun/";
 // Video
 let video;
 let flippedVideo;
@@ -12,21 +12,19 @@ let flippedVideo;
 let label = "";
 
 // Player
-var playerX = 200;
-var playerY = 200;
+var playerX = windowX / 2;
+var playerY = windowY / 2;
 var playerSize = 20;
+var playerSpeed = 7;
 
 // Enemy
-const enemyCount = 15;
+const enemyCount = 5;
 let enemies = [];
-
-// Game Logic
-let gameoverFlag = false;
-
 class Enemy {
     x = 0;
     y = 0;
     size = 10;
+    speed = 5;
 
     constructor(x, y) {
         this.x = x;
@@ -34,8 +32,8 @@ class Enemy {
     }
 
     logic() {
-        this.x += random(-5, 5);
-        this.y += random(-5, 5);
+        this.x += random(0, 5) * this.speed;
+        this.y += random(0, 5) * this.speed;
 
         if (this.y < 0) {
             this.y = windowY - 10;
@@ -67,16 +65,16 @@ class Enemy {
     }
 }
 
+// Game Logic
+let gameoverFlag = false;
+let timer = 0;
+
 // Load the model first
 function preload() {
     classifier = ml5.imageClassifier(imageModelURL + "model.json");
 }
 
 function setup() {
-    enemies = [];
-    gameoverFlag = false;
-    playerY = 200;
-    playerX = 200;
     removeElements();
     createCanvas(windowX, windowY);
     video = createCapture(video);
@@ -86,6 +84,32 @@ function setup() {
     flippedVideo = ml5.flipImage(video);
     // Start classifying
     classifyVideo();
+
+    startGame();
+
+    setInterval(() => {
+        if (gameoverFlag) return;
+        timer++;
+        document.getElementById("time-survived").textContent = "Time Survived: " + timer;
+    }, 1000);
+}
+
+function startGame() {
+    enemies = [];
+    gameoverFlag = false;
+    playerY = windowY / 2;
+    playerX = windowX / 2;
+    timer = 0;
+
+    // DOM Elements
+    if (document.getElementById("retry-button") !== null)
+        document.getElementById("retry-button").remove();
+    if (document.getElementById("gameover-text") !== null)
+        document.getElementById("gameover-text").remove();
+
+        
+    document.getElementById("time-survived").classList.remove("time-survived-over");
+    document.getElementById("time-survived").classList.add("time-survived");
 
     for (let i = 0; i < enemyCount; i++) {
         let xRand = random(0, windowX);
@@ -100,13 +124,14 @@ function draw() {
     // Main Gameloop
     if (!gameoverFlag) {
         // Draw the video
+        tint(255, 255, 255, 100)
         image(flippedVideo, 0, 0);
 
         // Draw the label
         fill(255);
         textSize(16);
         textAlign(CENTER);
-        text(label, windowX / 2, windowY - 4);
+        text(label, windowX / 2, windowY * 0.9);
 
         square(playerX, playerY, playerSize);
 
@@ -117,18 +142,17 @@ function draw() {
 
         switch (label) {
             case "up":
-                playerY--;
+                playerY -= playerSpeed;
                 break;
             case "down":
-                playerY++;
+                playerY += playerSpeed;
                 break;
             case "left":
-                playerX--;
+                playerX -= playerSpeed;
                 break;
             case "right":
-                playerX++;
+                playerX += playerSpeed;
                 break;
-
             default:
                 break;
         }
@@ -149,14 +173,18 @@ function draw() {
         }
     } else { 
         // Game Over
-        textSize(24);
-        textAlign(CENTER);
-        text("GAME OVER", (windowX / 2) - 12, (windowY / 2) - 12);
+        if (document.getElementById("gameover-text") === null) {
+            let gameoverText = createDiv("GAME OVER");
+            gameoverText.id("gameover-text");
+        
+            let button = createButton("Retry");
+            button.id("retry-button");
+            button.position((windowX / 2), (windowY / 2) + 12);
+            button.mousePressed(startGame);
     
-        let button = createButton("Retry");
-        button.id("retryButton");
-        button.position((windowX / 2), (windowY / 2) + 12);
-        button.mousePressed(setup);
+            document.getElementById("time-survived").classList.remove("time-survived");
+            document.getElementById("time-survived").classList.add("time-survived-over");
+        }
     }
 }
 
